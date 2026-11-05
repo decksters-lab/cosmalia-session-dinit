@@ -64,7 +64,10 @@ jobs:
             usr/share/doc/cosmalia-session-dinit/README.md \
             usr/share/licenses/cosmalia-session-dinit/LICENSE \
             usr/share/licenses/cosmalia-session-dinit/cosmalia-session; do
-            grep -qE "^-rw-r--r-- .*${path}\$" /tmp/pkglist.txt
+            case "$(grep "${path}\$" /tmp/pkglist.txt | head -1)" in
+              '-rw-r--r--'*|'lrwxrwxrwx'*) ;;
+              *) false ;;
+            esac
           done
 
       - name: Install/remove smoke test
