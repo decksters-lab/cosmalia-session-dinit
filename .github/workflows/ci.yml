@@ -64,7 +64,8 @@ jobs:
             usr/share/doc/cosmalia-session-dinit/README.md \
             usr/share/licenses/cosmalia-session-dinit/LICENSE \
             usr/share/licenses/cosmalia-session-dinit/cosmalia-session; do
-            case "$(grep "${path}\$" /tmp/pkglist.txt | head -1)" in
+            # Match path followed by end-of-line or space (for symlinks with -> target)
+            case "$(grep -E "${path}( |$)" /tmp/pkglist.txt | head -1)" in
               '-rw-r--r--'*|'lrwxrwxrwx'*) ;;
               *) false ;;
             esac

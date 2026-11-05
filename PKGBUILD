@@ -72,5 +72,5 @@ package() {
 
   install -Dm644 "$startdir/README.md" "$pkgdir/usr/share/doc/$pkgname/README.md"
   install -Dm644 "$startdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-  ln -s "cosmalia-session" "$pkgdir/usr/share/licenses/$pkgname/cosmalia-session"
+  ln -s "LICENSE" "$pkgdir/usr/share/licenses/$pkgname/cosmalia-session"
 }
