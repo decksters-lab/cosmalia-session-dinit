@@ -1,6 +1,6 @@
 name: Artix package
 
-# Builds the cosmalia-session Artix package and attaches it to a
+# Builds the cosmalia-session-dinit Artix package and attaches it to a
 # GitHub release, for every release tag (v*).
 #
 # Triggers
@@ -62,10 +62,10 @@ jobs:
 
           # pkgrel monotonic with packaged changes: 1, 2, 3, ...
           pkgrel=$(git rev-list --count HEAD -- \
-            PKGBUILD cosmalia-session.install files README.md LICENSE \
+            PKGBUILD cosmalia-session-dinit.install files README.md LICENSE \
             scripts/set-default-greetd.sh)
           (( pkgrel >= 1 )) || pkgrel=1
-          echo "building cosmalia-session $version-$pkgrel"
+          echo "building cosmalia-session-dinit $version-$pkgrel"
 
           useradd -m builder 2>/dev/null || true
           echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
@@ -117,8 +117,8 @@ jobs:
           ### Install
 
           \`\`\`sh
-          gh release download $TAG -R $GITHUB_REPOSITORY -p '*.pkg.tar.zst*' -D /tmp/cosmalia-session
-          cd /tmp/cosmalia-session && sha256sum -c ./*.pkg.tar.zst.sha256
+          gh release download $TAG -R $GITHUB_REPOSITORY -p '*.pkg.tar.zst*' -D /tmp/cosmalia-session-dinit
+          cd /tmp/cosmalia-session-dinit && sha256sum -c ./*.pkg.tar.zst.sha256
           sudo pacman -U ./*.pkg.tar.zst
           \`\`\`
 
@@ -138,13 +138,13 @@ jobs:
           Needs \`cosmic-comp\`, \`noctalia\`, \`cosmic-settings\`,
           \`cosmic-settings-daemon\`, \`cosmic-screenshot\`,
           \`xdg-desktop-portal-cosmic\`, \`polkit\`,
-          \`gnome-keyring\` and \`wireplumber\`. The package replaces the old
-          \`cosmic-comp-traffic-session\` package.
+          \`gnome-keyring\` and \`wireplumber\`. Replaces the old
+          \`cosmalia-session\` package.
 
           ### Revert
 
           \`\`\`sh
-          sudo pacman -R cosmalia-session
+          sudo pacman -R cosmalia-session-dinit
           \`\`\`
           EOF
             )

@@ -29,8 +29,8 @@ esac
 
 # If the files are already package-managed, copying over them only makes pacman's
 # file list lie. Rebuild the package instead.
-if pacman -Qq cosmalia-session >/dev/null 2>&1; then
-    echo "cosmalia-session is installed as a package; pacman owns these" >&2
+if pacman -Qq cosmalia-session-dinit >/dev/null 2>&1; then
+    echo "cosmalia-session-dinit is installed as a package; pacman owns these" >&2
     echo "files. Bump pkgver/pkgrel in PKGBUILD and run 'makepkg -fi' instead." >&2
     exit 1
 fi
@@ -39,7 +39,7 @@ fi
 # over it would leave that file behind.
 if pacman -Qq cosmic-comp-traffic-session >/dev/null 2>&1; then
     echo "the old cosmic-comp-traffic-session package is installed. Replace it" >&2
-    echo "with cosmalia-session (or remove it) before running this script." >&2
+    echo "with cosmalia-session-dinit (or remove it) before running this script." >&2
     exit 1
 fi
 
@@ -74,9 +74,9 @@ done < <(find "$src" -type f -print0 | sort -z)
 sudo install -D -o root -g root -m 755 "$root/scripts/set-default-greetd.sh" \
     /usr/bin/cosmalia-session-default
 sudo install -D -o root -g root -m 644 "$root/README.md" \
-    /usr/share/doc/cosmalia-session/README.md
+    /usr/share/doc/cosmalia-session-dinit/README.md
 sudo install -D -o root -g root -m 644 "$root/LICENSE" \
-    /usr/share/licenses/cosmalia-session/LICENSE
+    /usr/share/licenses/cosmalia-session-dinit/LICENSE
 
 dinitctl --user reload
 echo "reloaded the dinit user manager"

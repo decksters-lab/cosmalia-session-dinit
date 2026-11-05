@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Make cosmalia-session the entry gtkgreet preselects, or with --list only add
+# Make cosmalia the entry gtkgreet preselects, or with --list only add
 # it to the dropdown while leaving the default alone. This is an explicit,
 # opt-in action: the package itself never edits /etc/greetd.
 #
@@ -110,7 +110,7 @@ remove_old_env_entry() {
 
 [[ -x $cmd ]] || {
     echo "$cmd is missing, install the session first (./scripts/install.sh" >&2
-    echo "or the cosmalia-session package)" >&2
+    echo "or the cosmalia-session-dinit package)" >&2
     exit 1
 }
 

@@ -9,7 +9,7 @@
 # The package does NOT edit /etc/greetd and does NOT make Cosmalia the default
 # session; `sudo cosmalia-session-default` does that explicitly.
 #
-#   makepkg -f       # -> cosmalia-session-<pkgver>-<pkgrel>-any.pkg.tar.zst
+#   makepkg -f       # -> cosmalia-session-dinit-<pkgver>-<pkgrel>-any.pkg.tar.zst
 #   makepkg -fi      # ... and install it
 #
 # pkgver comes from the nearest v* tag and pkgrel from the number of commits
@@ -18,18 +18,18 @@
 #
 #   SESSION_VERSION=1.2.3 SESSION_PKGREL=12 makepkg -f
 
-pkgname=cosmalia-session
+pkgname=cosmalia-session-dinit
 pkgver=${SESSION_VERSION:-$(git -C "${startdir:-$PWD}" describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')}
 pkgver=${pkgver:-1.2.3}
 _pkgrel=$(git -C "${startdir:-$PWD}" rev-list --count HEAD -- \
-  PKGBUILD cosmalia-session.install files README.md LICENSE \
+  PKGBUILD cosmalia-session-dinit.install files README.md LICENSE \
   scripts/set-default-greetd.sh 2>/dev/null || true)
 pkgrel=${SESSION_PKGREL:-${_pkgrel:-1}}
 (( pkgrel >= 1 )) || pkgrel=1
 
-pkgdesc='Cosmalia: minimal COSMIC desktop with cosmic-comp and Noctalia'
+pkgdesc='Cosmalia: minimal COSMIC desktop with cosmic-comp and Noctalia (dinit units)'
 arch=(any)
-url='https://github.com/grigio/cosmalia-session'
+url='https://github.com/grigio/cosmalia-session-dinit'
 license=(MIT)
 # cosmic-settings-daemon is what serves the cosmic-config watchers (theme,
 # appearance, keybind changes) over D-Bus; without it nothing reloads live.
@@ -55,7 +55,7 @@ depends=(
 optdepends=(
   'polkit-gnome: fallback polkit agent when Noctalia built-in agent is disabled'
 )
-install=cosmalia-session.install
+install=cosmalia-session-dinit.install
 source=()
 sha256sums=()
 
@@ -72,4 +72,5 @@ package() {
 
   install -Dm644 "$startdir/README.md" "$pkgdir/usr/share/doc/$pkgname/README.md"
   install -Dm644 "$startdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  ln -s "cosmalia-session" "$pkgdir/usr/share/licenses/$pkgname/cosmalia-session"
 }

@@ -23,7 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           shellcheck -s sh files/usr/bin/cosmalia-session
-          shellcheck -s bash scripts/*.sh cosmalia-session.install
+          shellcheck -s bash scripts/*.sh cosmalia-session-dinit.install
 
   package:
     name: makepkg
@@ -61,8 +61,9 @@ jobs:
             etc/dinit.d/user/cosmalia-session.target \
             etc/dinit.d/user/noctalia \
             etc/dinit.d/user/cosmic-settings-daemon \
-            usr/share/doc/cosmalia-session/README.md \
-            usr/share/licenses/cosmalia-session/LICENSE; do
+            usr/share/doc/cosmalia-session-dinit/README.md \
+            usr/share/licenses/cosmalia-session-dinit/LICENSE \
+            usr/share/licenses/cosmalia-session-dinit/cosmalia-session; do
             grep -qE "^-rw-r--r-- .*${path}\$" /tmp/pkglist.txt
           done
 
@@ -83,4 +84,4 @@ jobs:
             /etc/dinit.d/user/cosmic-settings-daemon; do
             test -f "$f" && test -s "$f"
           done
-          pacman -R --noconfirm cosmalia-session
+          pacman -R --noconfirm cosmalia-session-dinit
