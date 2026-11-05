@@ -70,6 +70,8 @@ jobs:
         run: |
           set -euo pipefail
           # --nodeps: cosmic-comp/noctalia are not in this container.
+          # dinit is needed for dinitctl verification of service files
+          pacman -Syu --noconfirm --needed --disable-download-timeout dinit
           pacman -U --noconfirm --nodeps /tmp/pkgout/*.pkg.tar.zst
           test -x /usr/bin/cosmalia-session
           test -x /usr/bin/cosmalia-session-default
