@@ -1,0 +1,13 @@
+# cosmic-settings-daemon - COSMIC settings daemon (cosmic-config watchers)
+
+type = process
+command = /usr/bin/cosmic-settings-daemon
+
+# Hard dependency on cosmalia-session.target (like PartOf=)
+# Stopping cosmalia-session.target stops this service
+depends-on: cosmalia-session.target
+
+# Restart on failure (like systemd Restart=on-failure)
+restart = on-failure
+restart-delay = 1
+stop-timeout = 5

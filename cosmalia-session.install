@@ -1,0 +1,44 @@
+# The package installs the session and its dinit user services. It deliberately
+# does not edit /etc/greetd: installing a package should not change which
+# session the greeter starts. Making Cosmalia the default is an explicit step.
+post_install() {
+  cat <<'EOF'
+Cosmalia is installed. It was NOT set as the default session: this package
+does not edit /etc/greetd.
+
+Greeters that read /usr/share/wayland-sessions (Noctalia Greeter, GDM, SDDM)
+already list it. gtkgreet only lists /etc/greetd/environments plus its -c
+argument. To make Cosmalia selectable without changing the default:
+
+  sudo cosmalia-session-default --list
+
+To make it the default, run:
+  sudo cosmalia-session-default
+EOF
+}
+
+post_upgrade() {
+  if grep -qs '/usr/local/bin/cosmic-comp-traffic-session' \
+      /etc/greetd/config.toml /etc/greetd/environments 2>/dev/null; then
+    cat <<'EOF'
+The old cosmic-comp-traffic-session launcher is still referenced by the greeter
+but its package was replaced, so that entry no longer exists. Remove the -c
+argument or the /etc/greetd/environments line, or run (this also makes Cosmalia
+the default):
+
+  sudo cosmalia-session-default
+EOF
+  fi
+}
+
+pre_remove() {
+  cat <<'EOF'
+Removing this package does not change /etc/greetd. If Cosmalia is the greeter
+default, point the greeter at another session first, otherwise it will try to
+start a command that no longer exists.
+
+  sudo cp -a /etc/greetd/config.toml.bak.<timestamp> /etc/greetd/config.toml
+
+(or edit the -c argument / environments list by hand).
+EOF
+}

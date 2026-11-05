@@ -1,0 +1,84 @@
+name: CI
+
+# Cheap sanity checks on every push / pull request: the shell scripts pass
+# shellcheck and the PKGBUILD still builds. Releases are built by
+# artix-package.yml on v* tags.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: shellcheck
+        run: |
+          set -euo pipefail
+          shellcheck -s sh files/usr/bin/cosmalia-session
+          shellcheck -s bash scripts/*.sh cosmalia-session.install
+
+  package:
+    name: makepkg
+    runs-on: ubuntu-latest
+    container:
+      image: artixlinux/artixlinux:base-devel
+      options: --privileged
+    steps:
+      - name: Bootstrap git
+        run: pacman -Syu --noconfirm --needed --disable-download-timeout git
+
+      - uses: actions/checkout@v6
+
+      - name: Build
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          useradd -m builder 2>/dev/null || true
+          mkdir -p /tmp/pkgout
+          chown -R builder:builder "$GITHUB_WORKSPACE" /tmp/pkgout
+          # cosmic-comp is in the official repos; skip the dep check for
+          # packages not in the container (noctalia, cosmic-settings, etc.)
+          su builder -s /bin/bash -c "
+            cd '$GITHUB_WORKSPACE'
+            PKGDEST=/tmp/pkgout makepkg --nodeps --noconfirm --force
+          "
+          ls -l /tmp/pkgout
+          # the launcher and helper must be executable inside the package
+          bsdtar -tvf /tmp/pkgout/*.pkg.tar.zst | tee /tmp/pkglist.txt
+          grep -qE '^-rwxr-xr-x .*usr/bin/cosmalia-session$' /tmp/pkglist.txt
+          grep -qE '^-rwxr-xr-x .*usr/bin/cosmalia-session-default$' /tmp/pkglist.txt
+          for path in \
+            usr/share/wayland-sessions/cosmalia.desktop \
+            usr/share/xdg-desktop-portal/cosmalia-portals.conf \
+            etc/dinit.d/user/cosmalia-session.target \
+            etc/dinit.d/user/noctalia \
+            etc/dinit.d/user/cosmic-settings-daemon \
+            usr/share/doc/cosmalia-session/README.md \
+            usr/share/licenses/cosmalia-session/LICENSE; do
+            grep -qE "^-rw-r--r-- .*${path}\$" /tmp/pkglist.txt
+          done
+
+      - name: Install/remove smoke test
+        run: |
+          set -euo pipefail
+          # --nodeps: cosmic-comp/noctalia are not in this container.
+          pacman -U --noconfirm --nodeps /tmp/pkgout/*.pkg.tar.zst
+          test -x /usr/bin/cosmalia-session
+          test -x /usr/bin/cosmalia-session-default
+          test -f /etc/dinit.d/user/noctalia
+          # The post_install script must not need /etc/greetd (and must not
+          # edit it). Verify the units resolve, then remove the package.
+          install -d -m 700 /tmp/run
+          XDG_RUNTIME_DIR=/tmp/run dinitctl --user verify \
+            /etc/dinit.d/user/cosmalia-session.target \
+            /etc/dinit.d/user/noctalia \
+            /etc/dinit.d/user/cosmic-settings-daemon
+          pacman -R --noconfirm cosmalia-session

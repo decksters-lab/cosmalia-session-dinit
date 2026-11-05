@@ -1,0 +1,12 @@
+# cosmalia-session.target - Cosmalia session target
+# Internal service (like a systemd target) that pulls in the session services
+
+type = internal
+
+# No depends-on: graphical.target (turnstiled not available in this setup)
+# The session launcher manages the compositor and services directly
+
+# Milestone dependencies on session services (start them, but don't tie stop lifecycle)
+# Like systemd Wants= - starting target starts these, but stopping them doesn't stop target
+depends-ms: noctalia
+depends-ms: cosmic-settings-daemon
